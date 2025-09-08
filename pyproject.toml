@@ -1,0 +1,11 @@
+[project]
+name = "api-requests-poc-taf"
+version = "0.1.0"
+description = "POC Test Automation Framework for API testing with pytest and requests"
+readme = "README.md"
+requires-python = ">=3.9"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+pythonpath = ["src"]
