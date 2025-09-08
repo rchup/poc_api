@@ -3,8 +3,9 @@ import json
 import pytest
 from dotenv import load_dotenv
 
-from taf import ApiClient, ClientConfig
-from taf.logger import TcLogger
+from api.client import ApiClient
+from api.config import ClientConfig
+from modules.logger import TcLogger
 
 
 @pytest.fixture(scope="session", autouse=True)
