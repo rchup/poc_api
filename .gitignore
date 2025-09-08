@@ -42,3 +42,6 @@ reports/
 
 # Misc
 .ipynb_checkpoints/
+src/taf/__pycache__/__init__.cpython-313.pyc
+src/taf/__pycache__/api_client.cpython-313.pyc
+src/taf/__pycache__/config.cpython-313.pyc
