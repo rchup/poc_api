@@ -1,6 +1,6 @@
 # API Test Automation Framework (POC)
 
-A minimal, extensible Python test automation framework for API testing using pytest and requests.
+A minimal, extensible Python test automation framework for API and UI testing using pytest, requests, and Playwright.
 
 ## Quickstart
 
@@ -15,9 +15,19 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-3. Run tests
+3. Run API tests
 ```bash
-pytest -q
+pytest -q tests -k "not ui"
+```
+
+4. Install Playwright browsers (once)
+```bash
+python -m playwright install --with-deps
+```
+
+5. Run UI tests
+```bash
+pytest -q -m ui
 ```
 
 ## Structure
@@ -28,13 +38,14 @@ api_requests_poc/
       __init__.py
       logger.py
       api/
-        __init__.py (implicit)
         client.py
         config.py
         base_api.py
   tests/
     conftest.py
     test_health.py
+    ui/
+      test_example_ui.py
   .github/workflows/ci.yml
   .gitlab-ci.yml
   pyproject.toml
@@ -43,22 +54,14 @@ api_requests_poc/
 ```
 
 ## Features
-- Session-based client with retries, backoff, and timeouts
-- Request/response logging with secret redaction
-- Defaults headers support and optional Bearer token
-- JSON convenience helpers (`get_json`, `post_json`)
+- API: Session-based client with retries, backoff, timeouts, logging, and JSON helpers
+- UI: pytest + Playwright fixtures (page/context) for browser automation
 
 ## Environment variables
-- `API_BASE_URL` (default: `https://httpbin.org`)
-- `API_TIMEOUT` (default: `10`)
-- `API_MAX_RETRIES` (default: `2`)
-- `API_BACKOFF_FACTOR` (default: `0.2`)
-- `API_VERIFY_SSL` (default: `true`)
-- `API_TOKEN` (optional)
-- `API_DEFAULT_HEADERS` (JSON object string, e.g. `{"X-Trace":"test"}`)
-- `API_LOG_LEVEL` (e.g. `DEBUG`, `INFO`)
+- API: `API_BASE_URL`, `API_TIMEOUT`, `API_MAX_RETRIES`, `API_BACKOFF_FACTOR`, `API_VERIFY_SSL`, `API_TOKEN`, `API_DEFAULT_HEADERS`, `API_LOG_LEVEL`
+- UI: `UI_BASE_URL` (default: `https://playwright.dev`)
 
 ## CI
 - GitHub Actions: `.github/workflows/ci.yml`
 - GitLab CI: `.gitlab-ci.yml`
-  - Produces JUnit report artifact `report.xml` for MR test summaries.
+  - Adjust to install Playwright browsers for UI jobs

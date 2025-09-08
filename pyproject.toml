@@ -9,3 +9,6 @@ requires-python = ">=3.9"
 addopts = "-q"
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "ui: marks tests as UI/browser tests",
+]
