@@ -1,7 +1,9 @@
 __all__ = [
 	"ApiClient",
 	"ClientConfig",
+	"BaseApi",
 ]
 
-from .api_client import ApiClient
-from .config import ClientConfig
+from .api.client import ApiClient
+from .api.config import ClientConfig
+from .api.base_api import BaseApi

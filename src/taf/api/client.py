@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json as _json
 from typing import Any, Dict, Optional
 
 import requests
@@ -8,11 +9,16 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from .config import ClientConfig
+from taf.logger import configure_logging, get_logger, redact_headers, log_timing
+
+
+_logger = get_logger(__name__)
 
 
 class ApiClient:
     def __init__(self, config: ClientConfig) -> None:
         self._config = config
+        configure_logging(config.log_level)
         self._session = requests.Session()
         retries = Retry(
             total=config.max_retries,
@@ -25,6 +31,8 @@ class ApiClient:
         adapter = HTTPAdapter(max_retries=retries)
         self._session.mount("http://", adapter)
         self._session.mount("https://", adapter)
+        if config.default_headers:
+            self._session.headers.update(config.default_headers)
         if config.api_key:
             self._session.headers.update({"Authorization": f"Bearer {config.api_key}"})
 
@@ -48,15 +56,24 @@ class ApiClient:
         if headers:
             request_headers.update(headers)
 
-        response = self._session.request(
-            method=method.upper(),
-            url=url,
-            params=params,
-            json=json,
-            headers=request_headers or None,
-            timeout=timeout or self._config.timeout_seconds,
-            verify=self._config.verify_ssl,
+        _logger.debug(
+            "HTTP %s %s params=%s headers=%s body=%s",
+            method.upper(),
+            url,
+            params,
+            redact_headers({**self._session.headers, **request_headers} if self._session.headers else request_headers),
+            _json.dumps(json)[:512] if json is not None else None,
         )
+        with log_timing(_logger, f"{method.upper()} {url}"):
+            response = self._session.request(
+                method=method.upper(),
+                url=url,
+                params=params,
+                json=json,
+                headers=request_headers or None,
+                timeout=timeout or self._config.timeout_seconds,
+                verify=self._config.verify_ssl,
+            )
         return response
 
     def get(self, path: str, **kwargs: Any) -> Response:
@@ -73,3 +90,14 @@ class ApiClient:
 
     def delete(self, path: str, **kwargs: Any) -> Response:
         return self.request("DELETE", path, **kwargs)
+
+    # JSON helpers
+    def get_json(self, path: str, **kwargs: Any) -> Any:
+        resp = self.get(path, **kwargs)
+        resp.raise_for_status()
+        return resp.json()
+
+    def post_json(self, path: str, *, json: Optional[Dict[str, Any]] = None, **kwargs: Any) -> Any:
+        resp = self.post(path, json=json, **kwargs)
+        resp.raise_for_status()
+        return resp.json()
