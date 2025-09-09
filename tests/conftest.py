@@ -3,9 +3,9 @@ import json
 import pytest
 from dotenv import load_dotenv
 
-from api.client import ApiClient
-from api.config import ClientConfig
 from modules.logger import TcLogger
+from src.api.client import ApiClient
+from src.api.config import ClientConfig
 
 
 @pytest.fixture(scope="session", autouse=True)

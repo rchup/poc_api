@@ -1,3 +1,4 @@
+playwright
 pytest==8.3.2
 requests==2.32.3
 urllib3==2.2.3

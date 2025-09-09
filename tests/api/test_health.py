@@ -1,5 +1,5 @@
-from api.client import ApiClient
 from modules.logger import TcLogger
+from src.api.client import ApiClient
 
 
 def test_get_status_ok(api_client: ApiClient) -> None:
