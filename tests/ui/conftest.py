@@ -23,8 +23,13 @@ def pytest_runtest_makereport(item, call):
 
 @pytest.fixture(scope="function")
 def page(browser: Browser, request: pytest.FixtureRequest, ui_artifacts_dir: str):
+    # Check if headless mode is enabled
+    headless = os.getenv("HEADLESS", "false").lower() in ("true", "1", "yes")
+    
     # Create a new context per test with video recording
-    context = browser.new_context(record_video_dir=ui_artifacts_dir)
+    context = browser.new_context(
+        record_video_dir=ui_artifacts_dir if not headless else None
+    )
     # Enable tracing
     context.tracing.start(screenshots=True, snapshots=True, sources=True)
 
