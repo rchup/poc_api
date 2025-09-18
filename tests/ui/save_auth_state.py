@@ -4,7 +4,7 @@ from playwright.sync_api import sync_playwright
 
 # Add modules to path for logger
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'modules'))
-from logger import get_logger
+from logger import get_logger  # type: ignore
 
 
 def manual_login_and_save_auth():
@@ -34,9 +34,30 @@ def manual_login_and_save_auth():
             sso_button.click(force=True)
             logger.info("Clicked SSO button")
 
+            # Wait for SSO redirect and complete the flow
             logger.info("⏸️ Please complete SSO login manually in the browser...")
+            logger.info("   Complete the full SSO flow until you reach the ACME application.")
             logger.info("   The browser will pause here for you to finish authentication.")
             page.pause()
+
+            # Wait for the page to fully load after SSO completion
+            page.wait_for_timeout(3000)
+            
+            # Check if we're on the correct page after SSO
+            current_url = page.url
+            logger.info(f"Current URL after SSO: {current_url}")
+            
+            # If we're still on a login page or have auth codes, wait for redirect
+            if "login" in current_url.lower() or "code=" in current_url or "state=" in current_url:
+                logger.info("Waiting for SSO redirect to complete...")
+                page.wait_for_timeout(5000)
+                current_url = page.url
+                logger.info(f"URL after waiting: {current_url}")
+            
+            # Verify we're on the ACME application
+            if "acme" not in current_url.lower():
+                logger.warning(f"Not on ACME application. Current URL: {current_url}")
+                logger.info("Please ensure you complete the full SSO flow to reach the ACME application.")
 
             # Save authentication state
             context.storage_state(path=storage_path)
