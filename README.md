@@ -57,9 +57,34 @@ api_requests_poc/
 - API: Session-based client with retries, backoff, timeouts, logging, and JSON helpers
 - UI: pytest + Playwright fixtures (page/context) for browser automation
 
-## Environment variables
-- API: `API_BASE_URL`, `API_TIMEOUT`, `API_MAX_RETRIES`, `API_BACKOFF_FACTOR`, `API_VERIFY_SSL`, `API_TOKEN`, `API_DEFAULT_HEADERS`, `API_LOG_LEVEL`
-- UI: `UI_BASE_URL` (default: `https://playwright.dev`)
+## Environment Variables
+
+The project uses environment variables for configuration. Copy the template and customize as needed:
+
+```bash
+cp env.template .env
+```
+
+### API Testing Variables
+- `API_BASE_URL` - Base URL for API testing (default: `https://httpbin.org`)
+- `API_TOKEN` - API authentication token
+- `API_TIMEOUT` - Request timeout in seconds (default: `10`)
+- `API_MAX_RETRIES` - Maximum retry attempts (default: `2`)
+- `API_BACKOFF_FACTOR` - Backoff factor for retries (default: `0.2`)
+- `API_VERIFY_SSL` - Enable SSL verification (default: `true`)
+- `API_DEFAULT_HEADERS` - Default headers as JSON string
+- `API_LOG_LEVEL` - Logging level (default: `INFO`)
+
+### UI Testing Variables
+- `UI_ACME_URL` - ACME application URL (default: `https://qa.govpro.ai/t/acme/`)
+- `AUTH_STORAGE_PATH` - Path to save authentication state (default: `auth.json`)
+- `TEST_EMAIL` - Test user email (default: `roman.chuplak-c@unanet.com`)
+- `TEST_PROFILE_NAME` - Test user profile name (default: `Roman Chuplak-C`)
+- `HEADLESS` - Run browser in headless mode (default: `false`)
+
+### Reporting Variables
+- `REPORTS_DIR` - Base reports directory (default: `reports`)
+- `UI_REPORTS_DIR` - UI-specific reports directory (default: `reports/ui`)
 
 ## CI
 - GitHub Actions: `.github/workflows/ci.yml`

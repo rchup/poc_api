@@ -4,8 +4,10 @@ import pytest
 from playwright.sync_api import expect
 import sys
 import logging
+
+# Add modules to path for logger
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'modules'))
-from logger import get_logger
+from logger import get_logger  # type: ignore
 
 
 @pytest.mark.ui
