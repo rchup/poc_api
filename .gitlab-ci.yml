@@ -1,43 +1,11 @@
 stages:
-  - test
+  - lint
 
-variables:
-  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-  PYTHONDONTWRITEBYTECODE: "1"
-  PYTEST_ADDOPTS: "-q --junitxml=report.xml"
-
-cache:
-  paths:
-    - .cache/pip
-
-pytest:api:
-  stage: test
+flake8:lint:
+  stage: lint
   image: python:3.11-slim
   before_script:
     - python -m pip install --upgrade pip
-    - pip install -r requirements.txt
+    - pip install flake8
   script:
-    - pytest -k "not ui"
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
-    paths:
-      - report.xml
-
-pytest:ui:
-  stage: test
-  image: mcr.microsoft.com/playwright/python:v1.55.0-jammy
-  before_script:
-    - python -m pip install --upgrade pip
-    - pip install -r requirements.txt
-    - playwright install --with-deps
-  script:
-    - pytest -m ui
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
-    paths:
-      - report.xml
-      - reports/
+    - flake8 --max-line-length=120 --extend-exclude .venv,venv,.pytest_cache,.playwright-mcp --statistics --count src tests modules

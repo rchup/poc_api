@@ -25,10 +25,16 @@ def pytest_runtest_makereport(item, call):
 def page(browser: Browser, request: pytest.FixtureRequest, ui_artifacts_dir: str):
     # Check if headless mode is enabled
     headless = os.getenv("HEADLESS", "false").lower() in ("true", "1", "yes")
-    
-    # Create a new context per test with video recording
+
+    # Resolve optional storage state for authenticated sessions
+    storage_state_path_env = os.getenv("AUTH_STORAGE_PATH", "auth.json")
+    storage_state_path = pathlib.Path(storage_state_path_env).expanduser().resolve()
+    use_storage_state = storage_state_path.exists()
+
+    # Create a new context per test with optional storage state and video recording
     context = browser.new_context(
-        record_video_dir=ui_artifacts_dir if not headless else None
+        record_video_dir=ui_artifacts_dir if not headless else None,
+        storage_state=str(storage_state_path) if use_storage_state else None,
     )
     # Enable tracing
     context.tracing.start(screenshots=True, snapshots=True, sources=True)
